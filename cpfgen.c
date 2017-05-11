@@ -17,7 +17,7 @@ static unsigned long g_sample_count = 1;
 
 static void show_syntax( int argc, char ** argv )
 {
-	printf( "Sintaxe:\n\tcpfgen [-n qtd] [-f]\n\n", argv[0] );
+	printf( "Sintaxe:\n\t%s [-n qtd] [-f]\n\n", argv[0] );
 }
 
 
