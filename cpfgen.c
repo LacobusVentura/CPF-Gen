@@ -9,16 +9,15 @@
 #include <time.h>
 #include <string.h>
 
-#define MAX_BUF_LEN (32)
+#define MAX_BUF_LEN (16)
 
 static int g_formated_output = 0;
-static int g_sample_count = 1;
+static unsigned long g_sample_count = 1;
 
 
-static void syntax( int argc, char ** argv )
+static void show_syntax( int argc, char ** argv )
 {
 	printf( "Sintaxe:\n\tcpfgen [-n qtd] [-f]\n\n", argv[0] );
-	exit(1);
 }
 
 
@@ -39,11 +38,12 @@ static void initialize( int argc, char ** argv )
 
 			if( i < argc )
 			{
-				g_sample_count = atoi(argv[i]);
+				g_sample_count = atol(argv[i]);
 			}
 			else
 			{
-				syntax( argc, argv );
+				show_syntax( argc, argv );
+				exit(1);
 			}
 		}
 		else if( !strcmp( "-f", argv[i] ) )
@@ -52,27 +52,26 @@ static void initialize( int argc, char ** argv )
 		}
 		else
 		{
-			syntax( argc, argv );
+			show_syntax( argc, argv );
+			exit(1);
 		}
 	}
 }
 
 
-static const char * format( char * cpf )
+static int check( const char * cpf )
 {
-	char aux[ MAX_BUF_LEN + 1 ] = {0};
+	int i = 0;
 
-	snprintf( aux, MAX_BUF_LEN, "%c%c%c.%c%c%c.%c%c%c-%c%c", cpf[0], cpf[1], cpf[2],
-															cpf[3], cpf[4], cpf[5],
-															cpf[6], cpf[7], cpf[8],
-															cpf[9], cpf[10] );
-	strncpy( cpf, aux, MAX_BUF_LEN );
+	for( i = 1; i < 9; i++ )
+		if( cpf[i] != cpf[i-1] )
+			return 1;
 
-	return cpf;
+	return 0;
 }
 
 
-static const char * generate( char * buf, int fmtd )
+static const char * generate( char * cpf, int fmtd )
 {
 	int a = 0;
 	int b = 0;
@@ -81,49 +80,59 @@ static const char * generate( char * buf, int fmtd )
 	int i = 0;
 	int res = 0;
 	int n = 0;
-	char cpf[ MAX_BUF_LEN + 1 ] = {0};
+	int ok = 0;
+	int dv = 0;
+	char buf[ MAX_BUF_LEN + 1 ] = {0};
 
 
-	do {
+	while(!ok)
+	{
 		a = rand() % 1000;
 		b = rand() % 1000;
 		c = rand() % 1000;
-	} while( (a == b) && (a == c) );
 
-	snprintf( cpf, MAX_BUF_LEN, "%03d%03d%03d00", a, b, c );
+		snprintf( buf, MAX_BUF_LEN, "%03d%03d%03d", a, b, c );
+
+		ok = check( buf );
+	}
 
 	for( i = 0; i < 9; i++ )
 	{
-		n = cpf[i] - 48;
+		n = buf[i] - 48;
 		sum += (n * (10 - i));
 	}
 
 	res = 11 - (sum % 11);
 
-	if( (res != 10) && (res != 11) )
-		cpf[9] = res + 48;
+	if( res < 10 )
+	{
+		buf[9] = res + 48;
+		dv = res * 10;
+	}
 
 	sum = 0;
 
 	for( i = 0; i < 10; i++ )
 	{
-		n = cpf[i] - 48;
+		n = buf[i] - 48;
 		sum += n * (11 - i);
 	}
 
 	res = 11 - (sum % 11);
 
-	if( (res != 10) && (res != 11) )
-		cpf[10] = res + 48;
+	if( res < 10 )
+		dv += res;
 
-	cpf[11] = '\0';
+	if( fmtd )
+	{
+		snprintf( cpf, MAX_BUF_LEN, "%03d.%03d.%03d-%02d", a, b, c, dv );
+	}
+	else
+	{
+		snprintf( cpf, MAX_BUF_LEN, "%03d%03d%03d%02d", a, b, c, dv );
+	}
 
-	strncpy( buf, cpf, MAX_BUF_LEN );
-
-	if(fmtd)
-		format(buf);
-
-	return buf;
+	return cpf;
 }
 
 
