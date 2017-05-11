@@ -39,7 +39,7 @@ static void initialize( int argc, char ** argv )
 
 			if( i < argc )
 			{
-				g_sample_count = atoi( argv[ i + 1 ] );
+				g_sample_count = atoi(argv[i]);
 			}
 			else
 			{
