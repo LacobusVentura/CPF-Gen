@@ -1,3 +1,3 @@
 all:
-	gcc cpfgen.c -o cpfgen
+	gcc -Wall cpfgen.c -o cpfgen
 
