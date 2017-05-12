@@ -4,7 +4,7 @@ Gerador de Números Aleatórios de CPF
 Compilando:
 
 	$ make
-	gcc cpfgen.c -o cpfgen
+	gcc -Wall cpfgen.c -o cpfgen
 
 Exemplos:
 
