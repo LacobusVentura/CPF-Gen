@@ -12,7 +12,7 @@
 #define MAX_BUF_LEN (16)
 
 static int g_formated_output = 0;
-static unsigned long g_sample_count = 1;
+static int g_sample_count = 1;
 
 
 static void show_syntax( int argc, char ** argv )
@@ -38,7 +38,7 @@ static void initialize( int argc, char ** argv )
 
 			if( i < argc )
 			{
-				g_sample_count = atol(argv[i]);
+				g_sample_count = atoi(argv[i]);
 			}
 			else
 			{
@@ -91,7 +91,7 @@ static const char * generate( char * cpf, int fmtd )
 		b = rand() % 1000;
 		c = rand() % 1000;
 
-		snprintf( buf, MAX_BUF_LEN, "%03d%03d%03d", a, b, c );
+		snprintf( buf, MAX_BUF_LEN, "%03d%03d%03d00", a, b, c );
 
 		ok = check( buf );
 	}
